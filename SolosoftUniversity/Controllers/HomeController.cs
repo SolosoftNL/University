@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SolosoftUniversity.DAL;
+using SolosoftUniversity.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,6 +10,7 @@ namespace SolosoftUniversity.Controllers
 {
     public class HomeController : Controller
     {
+        private SchoolContext db = new SchoolContext();
         public ActionResult Index()
         {
             return View();
@@ -15,9 +18,16 @@ namespace SolosoftUniversity.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+                        ViewBag.Message = "EnrollementDate Group";
+                        var data = from student in db.Students
+                                   group student by student.EnrollmentDate into dateGroup
+                                   select new EnrollmentDateGroup
+                                   {
+                                       EnrollmentDate = dateGroup.Key,
+                                       StudentCount = dateGroup.Count()
+                                   };
 
-            return View();
+            return View(data.ToList());
         }
 
         public ActionResult Contact()
@@ -26,5 +36,15 @@ namespace SolosoftUniversity.Controllers
 
             return View();
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
     }
 }
